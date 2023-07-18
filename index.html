@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="style.css" />
+		<title>Atypia Index - Prototype</title>
+	</head>
+	<style>
+		:root {
+			--accent-color: #ed3b9d;
+			--background: #292b6a;
+			--border-color: #0b0c4b;
+		}
+		html,
+		body {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: sans-serif;
+		}
+
+		body,
+		.left_tringle__container {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		h3 {
+			text-align: left;
+			color: #9e9fb9;
+			font-size: 23px;
+		}
+
+		.left_tringle__container {
+			height: 600px;
+			width: 600px;
+			padding: 10px;
+			background-color: var(--background);
+			display: flex;
+			flex-direction: column;
+		}
+
+		.left_triangle__outter__wrapper {
+			width: 100%;
+			height: auto;
+			padding: 0 10px 10px 0;
+			background-color: var(--border-color);
+			overflow: hidden;
+		}
+
+		.triangle {
+			width: 100%;
+			height: 100px;
+			background-color: var(--border-color);
+			overflow: hidden;
+			position: relative;
+		}
+
+		.triangle::before {
+			content: "";
+			position: absolute;
+			height: 250px;
+			width: 40px;
+			background-color: var(--border-color);
+			left: -30px;
+			z-index: 1;
+		}
+
+		.triangle::after {
+			content: "";
+			position: absolute;
+			bottom: 0;
+			left: -24px;
+			top: -48px;
+			width: 700px;
+			height: 82px;
+			background-color: #292b6a;
+			border-top: 10px solid var(--border-color);
+			transform: rotate(172.6deg);
+			transform-origin: center;
+			z-index: 1;
+			-webkit-transform: rotate(172.6deg);
+			-moz-transform: rotate(172.6deg);
+			-ms-transform: rotate(172.6deg);
+			-o-transform: rotate(172.6deg);
+		}
+
+		.triangle__marker {
+			height: 200px;
+			width: 170px;
+			background: linear-gradient(90deg, transparent,var(--accent-color), transparent);
+			position: absolute;
+		}
+
+		.atypia__labels {
+			display: flex;
+			width: 100%;
+			justify-content: space-between;
+			border-bottom: 1px solid #7171c7;
+		}
+
+		.atypia__labels p {
+			color: white;
+			flex: 1;
+		}
+
+		.atypia__labels p:last-child {
+			text-align: right;
+			border-left: 1px dotted #7171c7;
+		}
+
+		.range {
+			border-radius: 50px;
+			margin-top: 30px;
+			width: 250px;
+			height: 21px;
+			background-color: var(--border-color);
+			-webkit-border-radius: 50px;
+			-moz-border-radius: 50px;
+			-ms-border-radius: 50px;
+			-o-border-radius: 50px;
+			display: flex;
+			align-items: center;
+			padding: 0 10px;
+		}
+
+		.range__track {
+			width: inherit;
+			height: auto;
+			position: relative;
+		}
+
+		.range__fill {
+			border-radius: 50px;
+			height: 5px;
+			background:var(--accent-color);
+		}
+
+		.range__thumb {
+			height: 15px;
+			width: 15px;
+			border-radius: 50%;
+			background-color: var(--accent-color);
+			-webkit-border-radius: 50%;
+			-moz-border-radius: 50%;
+			-ms-border-radius: 50%;
+			-o-border-radius: 50%;
+			position: absolute;
+			box-shadow: 0 0 3px 0 #3f3f3f;
+			top: -4.7px;
+			left: -5px;
+		}
+
+		.range__thumb:hover {
+			cursor: pointer;
+		}
+
+		.heading {
+			display: flex;
+			justify-content: flex-start;
+			align-items: center;
+			text-align: left;
+			width: 100%;
+		}
+
+		h3 {
+			display: inline-block;
+		}
+
+		.output {
+			display: inline-block;
+			text-align: center;
+			padding: 10px;
+			background: #9e9fb9;
+			border-radius: 8px;
+			margin-left: 15px;
+		}
+	</style>
+	<body>
+		<div class="left_tringle__container">
+			<!-- Title and output range -->
+			<div class="heading">
+				<h3>Atypia Index:</h3>
+				<span class="output" data-range-value>0.0</span>
+			</div>
+
+			<!-- Atypia Index Widget -->
+			<div class="left_triangle__outter__wrapper" data-range-marker-container>
+				<div class="triangle">
+					<div class="triangle__marker" data-range-marker></div>
+				</div>
+			</div>
+
+			<!-- Atypia Index Labels -->
+			<div class="atypia__labels">
+				<p>Lower</p>
+				<p>Higher</p>
+			</div>
+
+			<!-- custom input range -->
+			<div class="range" data-range-range>
+				<div class="range__track" data-range-track>
+					<div class="range__fill" data-range-fill data-range-min="0" data-range-max="100"></div>
+					<div class="range__thumb" data-range-thumb></div>
+				</div>
+			</div>
+		</div>
+		<script>
+			// UI widget
+			const marker = document.querySelector("[data-range-marker]");
+			const markercontainer = document.querySelector("[data-range-marker-container]");
+			const rangeValueContainer = document.querySelector("[data-range-value]");
+
+			// UI Range Slider
+			const range = document.querySelector("[data-range-range]");
+			const track = document.querySelector("[data-range-track]");
+			const filledProgress = document.querySelector("[data-range-fill]");
+			const thumb = document.querySelector("[data-range-thumb]");
+			// Min and Max values of the range
+			const rangeMinVal = document.querySelector("[data-range-min]").dataset.rangeMin;
+			const rangeMaxVal = document.querySelector("[data-range-max]").dataset.rangeMax;
+
+			let rangeWidth = range.offsetWidth;
+			let rangeLeft = range.offsetLeft;
+
+			// Set the marker position
+
+			let xCoord = 0;
+			let percent = 0;
+			let isMouseDown = false;
+
+			// Set the marker position
+			let markerContainerWidth = markercontainer.offsetWidth;
+			let markerWidth = marker.offsetWidth;
+			let markerLeft = marker.offsetLeft;
+
+			thumb.addEventListener("mousedown", () => {
+				isMouseDown = true;
+			});
+
+			thumb.addEventListener("mouseup", () => {
+				isMouseDown = false;
+			});
+
+			document.addEventListener("mouseup", () => {
+				isMouseDown = false;
+			});
+
+			window.addEventListener("mousemove", (e) => {
+				if (isMouseDown) {
+					xCoord = e.clientX - rangeLeft;
+					percent = (xCoord / rangeWidth) * 100;
+
+					if (Math.round(percent) < 100 && Math.round(percent) > 0) {
+						// Update the marker
+						markercontainer.style.left = percent + "%";
+						marker.style.left = percent - 12.5 + "%";
+						// Update the UI slider
+						filledProgress.style.width = percent + "%";
+						thumb.style.left = percent - 3 + "%";
+						let AtypiaIndexValue = percent / 100;
+						rangeValueContainer.innerHTML = AtypiaIndexValue.toFixed(2);
+                        console.log('Index:', AtypiaIndexValue.toFixed(2) * 100);
+					}
+				}
+			});
+		</script>
+	</body>
+</html>
